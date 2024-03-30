@@ -1,212 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tag Management</title>
-<style>
-  .container {
-	  display: flex;
-	  flex-wrap: wrap;
-	  gap: 10px;
-	  border: 1px solid #ccc;
-	  padding: 10px;
-	  align-items: center;
-	}
-	.pre-tag, .real-tag {
-	  display: flex;
-	  align-items: center;
-	  gap: 10px;
-	  background-color: #f0f0f0;
-	  border: 1px solid #ddd;
-	  padding: 5px 10px;
-	  order: 0;
-	}
-  .pre-tag span, .real-tag span {
-	  cursor: pointer;
-	}
-  .pre-tag input[type="checkbox"] {
-	  margin-right: 5px;
-	}
-  #add-new-tag-btn-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  #real-tag-definer {
-	width: 80px;
-    order: 1;
-    border: 0;
-    outline: none;
-    background: #f9f6f6;
-    height: 30px;
-    padding-top: 0px;
-    margin-top: 0px;
-    min-width: 80px; /* Bu değeri gereksinimlerinize göre ayarlayın */    
-    resize: none; /* Kullanıcı tarafından yeniden boyutlandırma engellendi */
-    /*bu kontrolün genişliği içinde bulunduğu container'in genişliğini geçemeyecek şekilde stil vermek gerekiyor */
 
-  }
-</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tag Management</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            align-items: flex-start;
+        }
+
+        .pre-tag,
+        .real-tag {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            order: 0;
+        }
+
+        .pre-tag span,
+        .real-tag span {
+            cursor: pointer;
+        }
+
+        .pre-tag input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        #add-new-tag-btn-container {
+            display: flex;
+            align-items: center;
+        }
+
+        #real-tag-definer {
+            width: 80px;
+            order: 1;
+            border: 0;
+            outline: none;
+            background: #f9f6f6;
+            height: 30px;
+            padding-top: 0px;
+            margin-top: 0px;
+            min-width: 80px;
+            /* Bu değeri gereksinimlerinize göre ayarlayın */
+            resize: none;
+            /* Kullanıcı tarafından yeniden boyutlandırma engellendi */
+            /*bu kontrolün genişliği içinde bulunduğu container'in genişliğini geçemeyecek şekilde stil vermek gerekiyor */
+
+        }
+    </style>
 </head>
+
 <body>
 
-<input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
-<div class="container" id="real-tag-container">
-  <!-- Real tags burada yer alacak -->
-  <input type="text" id="real-tag-definer" placeholder="Define a tag" oninput="autoExpandInput(this)">  
-</div>
+    <input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
+    <div class="container" id="real-tag-container">
+        <!-- Real tags burada yer alacak -->
+        <input type="text" id="real-tag-definer" placeholder="Define a tag" oninput="autoExpandInput(this)">
+    </div>
 
-<div class="container" id="pre-tag-container"><div id="add-new-tag-btn-container"></div></div>
-<input type="text" id="textUsableTags" placeholder="Silinmemiş Metinler" readonly>
-<input type="text" id="textSelectedTags" placeholder="Seçilmiş Metinler" readonly>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    let tagsFromDb = ['tag1', 'tag2', 'tag3', 'tag2'];
-    let usableTags = [...new Set(tagsFromDb)];
-    let selectedTags = [];
+    <div class="container" id="pre-tag-top-container">
+        <!-- Add New Tag Button Container -->
+        <div class="container" id="add-tag-btn-top-container">
+            <div id="add-new-tag-btn-container"></div>
+        </div>
 
-    const textTagsFromDb = document.getElementById('textTagsFromDb');
-    const textUsableTags = document.getElementById('textUsableTags');
-    const textSelectedTags = document.getElementById('textSelectedTags');
-    const preTagContainer = document.getElementById('pre-tag-container');
-    const realTagContainer = document.getElementById('real-tag-container');
-    const realTagDefiner = document.getElementById('real-tag-definer');
-    const addNewTagBtnContainer = document.getElementById('add-new-tag-btn-container');
+        <!-- Etiketler ve Yeni Etiket Ekleme Alanı -->
+        <div class="container" id="pre-tag-container">
+           
+        </div>
+    </div>
 
-	preTagContainer.style.display = 'none';
-    textTagsFromDb.value = tagsFromDb.join(', ');
-    updateUsableTagsDisplay();
+    <input type="text" id="textUsableTags" placeholder="Silinmemiş Metinler" readonly>
+    <input type="text" id="textSelectedTags" placeholder="Seçilmiş Metinler" readonly>
 
-    realTagDefiner.addEventListener('input', function() {
-        addNewTagBtnContainer.innerHTML = '';
-        if(this.value.trim() !== '') {
-            const addButton = document.createElement('button');
-            addButton.textContent = `Add new ${this.value}`;
-            addButton.onclick = function() {
-                addOrSelectTag(realTagDefiner.value.trim());
-            };
-            addNewTagBtnContainer.appendChild(addButton);
-        }
-    });
-	
-    function addOrSelectTag(newTag) {
-        const isNewTag = !usableTags.includes(newTag);
-        const isNotSelected = !selectedTags.includes(newTag);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let tagsFromDb = ['tag1', 'tag2', 'tag3', 'tag2'];
+            let usableTags = [...new Set(tagsFromDb)];
+            let selectedTags = [];
 
-        if (isNewTag && newTag !== '') {
-            usableTags.push(newTag);
-        }
+            const textTagsFromDb = document.getElementById('textTagsFromDb');
+            const textUsableTags = document.getElementById('textUsableTags');
+            const textSelectedTags = document.getElementById('textSelectedTags');
+            const preTagTopContainer = document.getElementById('pre-tag-top-container');
+            const preTagContainer = document.getElementById('pre-tag-container');
+            const realTagContainer = document.getElementById('real-tag-container');
+            const realTagDefiner = document.getElementById('real-tag-definer');
+            const addNewTagBtnContainer = document.getElementById('add-new-tag-btn-container');
 
-        if (isNewTag || isNotSelected) {
-            selectedTags.push(newTag);
-        }
-
-        updateUsableTagsDisplay();
-        updateSelectedTagsDisplay();
-        realTagDefiner.value = '';
-        addNewTagBtnContainer.innerHTML = '';
-    }
-
-    function updateUsableTagsDisplay() {
-        const existingTags = preTagContainer.querySelectorAll('.pre-tag');
-		existingTags.forEach(tag => tag.remove());
-        textUsableTags.value = usableTags.join(', ');
-
-        usableTags.forEach(function(tag) {
-            const tagEl = document.createElement('div');
-            tagEl.className = 'pre-tag';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = selectedTags.includes(tag);
-            checkbox.onchange = function() {
-                if (this.checked) {
-                    if (!selectedTags.includes(tag)) {
-                        selectedTags.push(tag);
-                    }
-                } else {
-                    selectedTags = selectedTags.filter(t => t !== tag);
-                }
-                updateSelectedTagsDisplay();
-            };
-
-            const tagName = document.createElement('span');
-            tagName.textContent = tag;
-
-            const deleteBtn = document.createElement('span');
-            deleteBtn.textContent = 'X';
-            deleteBtn.onclick = function() {
-                if (!checkbox.checked) {
-                    usableTags = usableTags.filter(t => t !== tag);
-                    updateUsableTagsDisplay();
-                }
-            };
-
-            tagEl.appendChild(checkbox);
-            tagEl.appendChild(tagName);
-            tagEl.appendChild(deleteBtn);
-            preTagContainer.appendChild(tagEl);
-        });
-    }
-
-    function updateSelectedTagsDisplay() {
-		const existingTags = realTagContainer.querySelectorAll('.real-tag');
-		existingTags.forEach(tag => tag.remove());
-		textSelectedTags.value = selectedTags.join(', ');
-
-		selectedTags.forEach(function(tag) {
-			const tagEl = document.createElement('div');
-			tagEl.className = 'real-tag';
-			const tagName = document.createElement('span');
-			tagName.textContent = tag;
-
-			const deleteBtn = document.createElement('span');
-			deleteBtn.textContent = 'X';
-			deleteBtn.onclick = function() {
-				selectedTags = selectedTags.filter(t => t !== tag);
-				updateSelectedTagsDisplay();
-				updateUsableTagsDisplay();
-			};
-
-			tagEl.appendChild(tagName);
-			tagEl.appendChild(deleteBtn);
-			realTagContainer.insertBefore(tagEl, realTagDefiner);
-		});
-	}
-	
-	realTagContainer.addEventListener('click', function (event) {        
-        if (event.target === realTagContainer) {
-            realTagDefiner.focus();
-        }
-    });
-	
-	realTagContainer.addEventListener('click', function() {
-        preTagContainer.style.display = 'flex';
-    });
-	
-	document.addEventListener('click', function(event) {
-        if (!preTagContainer.contains(event.target) && !realTagContainer.contains(event.target)) {
             preTagContainer.style.display = 'none';
-        }
-		
-    });
-    
-});
-function autoExpandInput(input) {
-        // Geçici olarak genişliği sıfırlayarak doğru scrollWidth değerini almak
-        input.style.width = '0px';
-        // Input genişliğini içeriğin genişliği + biraz padding ile ayarla
-        let newWidth = input.scrollWidth + 10; // +10 px padding
+            textTagsFromDb.value = tagsFromDb.join(', ');
+            updateUsableTagsDisplay();
 
-        // Maksimum genişliği aşmamasını sağla
-        const maxWidth = 300; // Maksimum genişlik değeri, ihtiyacınıza göre ayarlayın
-        if (newWidth > maxWidth) {
-            newWidth = maxWidth;
-        }
+            realTagDefiner.addEventListener('input', function () {
+                addNewTagBtnContainer.innerHTML = '';
+                if (this.value.trim() !== '') {
+                    const addButton = document.createElement('button');
+                    addButton.textContent = `Add new ${this.value}`;
+                    addButton.onclick = function () {
+                        addOrSelectTag(realTagDefiner.value.trim());
+                    };
+                    addNewTagBtnContainer.appendChild(addButton);
+                }
+            });
 
-        input.style.width = `${newWidth}px`;
-    }
-</script>
+            function addOrSelectTag(newTag) {
+                const isNewTag = !usableTags.includes(newTag);
+                const isNotSelected = !selectedTags.includes(newTag);
+
+                if (isNewTag && newTag !== '') {
+                    usableTags.push(newTag);
+                }
+
+                if (isNewTag || isNotSelected) {
+                    selectedTags.push(newTag);
+                }
+
+                updateUsableTagsDisplay();
+                updateSelectedTagsDisplay();
+                realTagDefiner.value = '';
+                addNewTagBtnContainer.innerHTML = '';
+            }
+
+            function updateUsableTagsDisplay() {
+                const existingTags = preTagContainer.querySelectorAll('.pre-tag');
+                existingTags.forEach(tag => tag.remove());
+                textUsableTags.value = usableTags.join(', ');
+
+                usableTags.forEach(function (tag) {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'pre-tag';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = selectedTags.includes(tag);
+                    checkbox.onchange = function () {
+                        if (this.checked) {
+                            if (!selectedTags.includes(tag)) {
+                                selectedTags.push(tag);
+                            }
+                        } else {
+                            selectedTags = selectedTags.filter(t => t !== tag);
+                        }
+                        updateSelectedTagsDisplay();
+                    };
+
+                    const tagName = document.createElement('span');
+                    tagName.textContent = tag;
+
+                    const deleteBtn = document.createElement('span');
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.onclick = function () {
+                        if (!checkbox.checked) {
+                            usableTags = usableTags.filter(t => t !== tag);
+                            updateUsableTagsDisplay();
+                        }
+                    };
+
+                    tagEl.appendChild(checkbox);
+                    tagEl.appendChild(tagName);
+                    tagEl.appendChild(deleteBtn);
+                    preTagContainer.appendChild(tagEl);
+                });
+            }
+
+            function updateSelectedTagsDisplay() {
+                const existingTags = realTagContainer.querySelectorAll('.real-tag');
+                existingTags.forEach(tag => tag.remove());
+                textSelectedTags.value = selectedTags.join(', ');
+
+                selectedTags.forEach(function (tag) {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'real-tag';
+                    const tagName = document.createElement('span');
+                    tagName.textContent = tag;
+
+                    const deleteBtn = document.createElement('span');
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.onclick = function () {
+                        selectedTags = selectedTags.filter(t => t !== tag);
+                        updateSelectedTagsDisplay();
+                        updateUsableTagsDisplay();
+                    };
+
+                    tagEl.appendChild(tagName);
+                    tagEl.appendChild(deleteBtn);
+                    realTagContainer.insertBefore(tagEl, realTagDefiner);
+                });
+            }
+
+            realTagContainer.addEventListener('click', function (event) {
+                if (event.target === realTagContainer) {
+                    realTagDefiner.focus();
+                }
+            });
+
+            realTagContainer.addEventListener('click', function () {
+                preTagContainer.style.display = 'flex';
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!preTagContainer.contains(event.target) && !realTagContainer.contains(event.target)) {
+                    preTagContainer.style.display = 'none';
+                }
+
+            });
+
+        });
+        function autoExpandInput(input) {
+
+            input.style.width = '0px';
+            let newWidth = input.scrollWidth + 10;
+            const maxWidth = 300;
+            if (newWidth > maxWidth) {
+                newWidth = maxWidth;
+            }
+
+            input.style.width = `${newWidth}px`;
+        }
+    </script>
 </body>
+
 </html>

@@ -34,8 +34,7 @@
   }
   
   #real-tag-definer {
-	max-width: 80px;
-    min-width: auto;
+	width: 80px;
     order: 1;
     border: 0;
     outline: none;
@@ -43,6 +42,10 @@
     height: 30px;
     padding-top: 0px;
     margin-top: 0px;
+    min-width: 80px; /* Bu değeri gereksinimlerinize göre ayarlayın */    
+    resize: none; /* Kullanıcı tarafından yeniden boyutlandırma engellendi */
+    /*bu kontrolün genişliği içinde bulunduğu container'in genişliğini geçemeyecek şekilde stil vermek gerekiyor */
+
   }
 </style>
 </head>
@@ -51,7 +54,7 @@
 <input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
 <div class="container" id="real-tag-container">
   <!-- Real tags burada yer alacak -->
-  <input type="text" id="real-tag-definer" placeholder="Define a new tag" oninput="autoExpandInput(this)">  
+  <input type="text" id="real-tag-definer" placeholder="Define a tag" oninput="autoExpandInput(this)">  
 </div>
 
 <div class="container" id="pre-tag-container"><div id="add-new-tag-btn-container"></div></div>
@@ -188,11 +191,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 		
     });
-    function autoExpandInput(input) {
-        input.style.width = "auto";
-        input.style.width = (input.scrollWidth + 10) + "px";
-    }
+    
 });
+function autoExpandInput(input) {
+        // Geçici olarak genişliği sıfırlayarak doğru scrollWidth değerini almak
+        input.style.width = '0px';
+        // Input genişliğini içeriğin genişliği + biraz padding ile ayarla
+        let newWidth = input.scrollWidth + 10; // +10 px padding
+
+        // Maksimum genişliği aşmamasını sağla
+        const maxWidth = 300; // Maksimum genişlik değeri, ihtiyacınıza göre ayarlayın
+        if (newWidth > maxWidth) {
+            newWidth = maxWidth;
+        }
+
+        input.style.width = `${newWidth}px`;
+    }
 </script>
 </body>
 </html>

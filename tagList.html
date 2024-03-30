@@ -15,6 +15,14 @@
             align-items: flex-start;
         }
 
+        .top-container {
+            display: block;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 1px solid #ccc;
+            padding: 0px;
+            align-items: flex-start;
+        }
         .pre-tag,
         .real-tag {
             display: flex;
@@ -40,6 +48,10 @@
             align-items: center;
         }
 
+        #add-tag-btn-top-container {            
+            padding: 0px;
+        }
+
         #real-tag-definer {
             width: 80px;
             order: 1;
@@ -49,12 +61,8 @@
             height: 30px;
             padding-top: 0px;
             margin-top: 0px;
-            min-width: 80px;
-            /* Bu değeri gereksinimlerinize göre ayarlayın */
+            min-width: 80px;            
             resize: none;
-            /* Kullanıcı tarafından yeniden boyutlandırma engellendi */
-            /*bu kontrolün genişliği içinde bulunduğu container'in genişliğini geçemeyecek şekilde stil vermek gerekiyor */
-
         }
     </style>
 </head>
@@ -62,21 +70,15 @@
 <body>
 
     <input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
-    <div class="container" id="real-tag-container">
-        <!-- Real tags burada yer alacak -->
+    <div class="container" id="real-tag-container">        
         <input type="text" id="real-tag-definer" placeholder="Define a tag" oninput="autoExpandInput(this)">
     </div>
 
-
-    <div class="container" id="pre-tag-top-container">
-        <!-- Add New Tag Button Container -->
+    <div class="top-container" id="pre-tag-top-container">
         <div class="container" id="add-tag-btn-top-container">
             <div id="add-new-tag-btn-container"></div>
         </div>
-
-        <!-- Etiketler ve Yeni Etiket Ekleme Alanı -->
-        <div class="container" id="pre-tag-container">
-           
+        <div class="container" id="pre-tag-container">           
         </div>
     </div>
 
@@ -96,9 +98,9 @@
             const preTagContainer = document.getElementById('pre-tag-container');
             const realTagContainer = document.getElementById('real-tag-container');
             const realTagDefiner = document.getElementById('real-tag-definer');
-            const addNewTagBtnContainer = document.getElementById('add-new-tag-btn-container');
+            const addNewTagBtnContainer = document.getElementById('add-tag-btn-top-container');
 
-            preTagContainer.style.display = 'none';
+            preTagTopContainer.style.display = 'none';
             textTagsFromDb.value = tagsFromDb.join(', ');
             updateUsableTagsDisplay();
 
@@ -206,13 +208,13 @@
 
             realTagContainer.addEventListener('click', function () {
                 preTagContainer.style.display = 'flex';
+                preTagTopContainer.style.display = 'block';
             });
-
+            
             document.addEventListener('click', function (event) {
-                if (!preTagContainer.contains(event.target) && !realTagContainer.contains(event.target)) {
-                    preTagContainer.style.display = 'none';
+                if (!preTagTopContainer.contains(event.target) && !realTagContainer.contains(event.target)) {
+                    preTagTopContainer.style.display = 'none';
                 }
-
             });
 
         });

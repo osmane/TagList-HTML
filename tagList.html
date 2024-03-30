@@ -32,13 +32,17 @@
     display: flex;
     align-items: center;
   }
-  #real-tag-definer, #add-new-tag-btn-container {
-	order: 1; /* Bu öğeleri container'ın sonuna taşır */
-	/*flex-grow: 1; Geri kalan alanı doldurur */
-  }
+  
   #real-tag-definer {
-	max-width: 70px;
+	max-width: 80px;
     min-width: auto;
+    order: 1;
+    border: 0;
+    outline: none;
+    background: #f9f6f6;
+    height: 30px;
+    padding-top: 0px;
+    margin-top: 0px;
   }
 </style>
 </head>
@@ -47,11 +51,10 @@
 <input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
 <div class="container" id="real-tag-container">
   <!-- Real tags burada yer alacak -->
-  <input type="text" id="real-tag-definer" placeholder="Define a new tag" style="margin-top: 10px;">
-  <div id="add-new-tag-btn-container"></div>
+  <input type="text" id="real-tag-definer" placeholder="Define a new tag">  
 </div>
 
-<div class="container" id="pre-tag-container"></div>
+<div class="container" id="pre-tag-container"><div id="add-new-tag-btn-container"></div></div>
 <input type="text" id="textUsableTags" placeholder="Silinmemiş Metinler" readonly>
 <input type="text" id="textSelectedTags" placeholder="Seçilmiş Metinler" readonly>
 
@@ -106,7 +109,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateUsableTagsDisplay() {
-        preTagContainer.innerHTML = ''; // Var olan etiketler temizlenir
+        //preTagContainer.innerHTML = ''; // Var olan etiketler temizlenir
+        const existingTags = preTagContainer.querySelectorAll('.pre-tag');
+		existingTags.forEach(tag => tag.remove());
         textUsableTags.value = usableTags.join(', ');
 
         usableTags.forEach(function(tag) {

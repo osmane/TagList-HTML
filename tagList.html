@@ -11,7 +11,7 @@
 	  gap: 10px;
 	  border: 1px solid #ccc;
 	  padding: 10px;
-	  align-items: center; /* İçerikleri dikey olarak ortalar */
+	  align-items: center;
 	}
 	.pre-tag, .real-tag {
 	  display: flex;
@@ -20,7 +20,7 @@
 	  background-color: #f0f0f0;
 	  border: 1px solid #ddd;
 	  padding: 5px 10px;
-	  order: 0; /* Bu öğeleri her zaman en başta tutar */
+	  order: 0;
 	}
   .pre-tag span, .real-tag span {
 	  cursor: pointer;
@@ -51,7 +51,7 @@
 <input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
 <div class="container" id="real-tag-container">
   <!-- Real tags burada yer alacak -->
-  <input type="text" id="real-tag-definer" placeholder="Define a new tag">  
+  <input type="text" id="real-tag-definer" placeholder="Define a new tag" oninput="autoExpandInput(this)">  
 </div>
 
 <div class="container" id="pre-tag-container"><div id="add-new-tag-btn-container"></div></div>
@@ -60,8 +60,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    let tagsFromDb = ['tag1', 'tag2', 'tag3', 'tag2']; // Örnek veri
-    let usableTags = [...new Set(tagsFromDb)]; // Tekrarlananlar çıkarıldı
+    let tagsFromDb = ['tag1', 'tag2', 'tag3', 'tag2'];
+    let usableTags = [...new Set(tagsFromDb)];
     let selectedTags = [];
 
     const textTagsFromDb = document.getElementById('textTagsFromDb');
@@ -72,12 +72,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const realTagDefiner = document.getElementById('real-tag-definer');
     const addNewTagBtnContainer = document.getElementById('add-new-tag-btn-container');
 
-	preTagContainer.style.display = 'none'; // Başlangıçta görünmez yap	
-    // İlk başlatma işlemleri
+	preTagContainer.style.display = 'none';
     textTagsFromDb.value = tagsFromDb.join(', ');
     updateUsableTagsDisplay();
 
-    // Yeni etiket ekleme butonunun oluşturulması
     realTagDefiner.addEventListener('input', function() {
         addNewTagBtnContainer.innerHTML = '';
         if(this.value.trim() !== '') {
@@ -95,21 +93,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const isNotSelected = !selectedTags.includes(newTag);
 
         if (isNewTag && newTag !== '') {
-            usableTags.push(newTag); // Yeni etiket usableTags'a eklenir
+            usableTags.push(newTag);
         }
 
         if (isNewTag || isNotSelected) {
-            selectedTags.push(newTag); // Yeni veya daha önceden var olan fakat seçilmemiş etiket, selectedTags'a eklenir
+            selectedTags.push(newTag);
         }
 
         updateUsableTagsDisplay();
         updateSelectedTagsDisplay();
-        realTagDefiner.value = ''; // Girdi temizlenir
-        addNewTagBtnContainer.innerHTML = ''; // Ekleme butonu kaldırılır
+        realTagDefiner.value = '';
+        addNewTagBtnContainer.innerHTML = '';
     }
 
     function updateUsableTagsDisplay() {
-        //preTagContainer.innerHTML = ''; // Var olan etiketler temizlenir
         const existingTags = preTagContainer.querySelectorAll('.pre-tag');
 		existingTags.forEach(tag => tag.remove());
         textUsableTags.value = usableTags.join(', ');
@@ -141,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     usableTags = usableTags.filter(t => t !== tag);
                     updateUsableTagsDisplay();
                 }
-                // Eğer checkbox seçiliyse, silme işlemi gerçekleşmez
             };
 
             tagEl.appendChild(checkbox);
@@ -152,11 +148,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateSelectedTagsDisplay() {
-		// Sadece 'real-tag' kutucuklarını temizle, real-tag-definer ve add-new-tag-btn-container'ı koru
 		const existingTags = realTagContainer.querySelectorAll('.real-tag');
 		existingTags.forEach(tag => tag.remove());
 		textSelectedTags.value = selectedTags.join(', ');
-		// Var olan etiketler temizlendikten sonra yenilerini ekle
+
 		selectedTags.forEach(function(tag) {
 			const tagEl = document.createElement('div');
 			tagEl.className = 'real-tag';
@@ -168,40 +163,36 @@ document.addEventListener('DOMContentLoaded', function () {
 			deleteBtn.onclick = function() {
 				selectedTags = selectedTags.filter(t => t !== tag);
 				updateSelectedTagsDisplay();
-				updateUsableTagsDisplay(); // pre-tag'lerin durumunu güncelle
+				updateUsableTagsDisplay();
 			};
 
 			tagEl.appendChild(tagName);
 			tagEl.appendChild(deleteBtn);
-			realTagContainer.insertBefore(tagEl, realTagDefiner); // real-tag-definer'dan önce ekle
+			realTagContainer.insertBefore(tagEl, realTagDefiner);
 		});
 	}
 	
 	realTagContainer.addEventListener('click', function (event) {        
         if (event.target === realTagContainer) {
-            realTagDefiner.focus(); // Metin kutusuna odaklan
+            realTagDefiner.focus();
         }
     });
 	
 	realTagContainer.addEventListener('click', function() {
-        preTagContainer.style.display = 'flex'; // Görünür yap
+        preTagContainer.style.display = 'flex';
     });
 	
 	document.addEventListener('click', function(event) {
-        // 'pre-tag-container' dışında bir yere tıklanırsa gizle
-        // Bu kontrol, 'real-tag-container' içindeki bir tıklamayı da içerir, çünkü 'real-tag-container' 'pre-tag-container'ı tekrar gösterecektir.
         if (!preTagContainer.contains(event.target) && !realTagContainer.contains(event.target)) {
             preTagContainer.style.display = 'none';
         }
 		
     });
+    function autoExpandInput(input) {
+        input.style.width = "auto";
+        input.style.width = (input.scrollWidth + 10) + "px";
+    }
 });
-
-
-
 </script>
-
-
-
 </body>
 </html>

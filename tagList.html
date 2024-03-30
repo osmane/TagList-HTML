@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tag Management</title>
+<style>
+  .container {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 10px;
+	  border: 1px solid #ccc;
+	  padding: 10px;
+	  align-items: center; /* İçerikleri dikey olarak ortalar */
+	}
+	.pre-tag, .real-tag {
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	  background-color: #f0f0f0;
+	  border: 1px solid #ddd;
+	  padding: 5px 10px;
+	  order: 0; /* Bu öğeleri her zaman en başta tutar */
+	}
+  .pre-tag span, .real-tag span {
+	  cursor: pointer;
+	}
+  .pre-tag input[type="checkbox"] {
+	  margin-right: 5px;
+	}
+  #add-new-tag-btn-container {
+    display: flex;
+    align-items: center;
+  }
+  #real-tag-definer, #add-new-tag-btn-container {
+	order: 1; /* Bu öğeleri container'ın sonuna taşır */
+	/*flex-grow: 1; Geri kalan alanı doldurur */
+  }
+  #real-tag-definer {
+	max-width: 70px;
+    min-width: auto;
+  }
+</style>
+</head>
+<body>
+
+<input type="text" id="textTagsFromDb" placeholder="Metin girin (virgülle ayırın)">
+<div class="container" id="real-tag-container">
+  <!-- Real tags burada yer alacak -->
+  <input type="text" id="real-tag-definer" placeholder="Define a new tag" style="margin-top: 10px;">
+  <div id="add-new-tag-btn-container"></div>
+</div>
+
+<div class="container" id="pre-tag-container"></div>
+<input type="text" id="textUsableTags" placeholder="Silinmemiş Metinler" readonly>
+<input type="text" id="textSelectedTags" placeholder="Seçilmiş Metinler" readonly>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let tagsFromDb = ['tag1', 'tag2', 'tag3', 'tag2']; // Örnek veri
+    let usableTags = [...new Set(tagsFromDb)]; // Tekrarlananlar çıkarıldı
+    let selectedTags = [];
+
+    const textTagsFromDb = document.getElementById('textTagsFromDb');
+    const textUsableTags = document.getElementById('textUsableTags');
+    const textSelectedTags = document.getElementById('textSelectedTags');
+    const preTagContainer = document.getElementById('pre-tag-container');
+    const realTagContainer = document.getElementById('real-tag-container');
+    const realTagDefiner = document.getElementById('real-tag-definer');
+    const addNewTagBtnContainer = document.getElementById('add-new-tag-btn-container');
+
+	preTagContainer.style.display = 'none'; // Başlangıçta görünmez yap	
+    // İlk başlatma işlemleri
+    textTagsFromDb.value = tagsFromDb.join(', ');
+    updateUsableTagsDisplay();
+
+    // Yeni etiket ekleme butonunun oluşturulması
+    realTagDefiner.addEventListener('input', function() {
+        addNewTagBtnContainer.innerHTML = '';
+        if(this.value.trim() !== '') {
+            const addButton = document.createElement('button');
+            addButton.textContent = `Add new ${this.value}`;
+            addButton.onclick = function() {
+                addOrSelectTag(realTagDefiner.value.trim());
+            };
+            addNewTagBtnContainer.appendChild(addButton);
+        }
+    });
+	
+    function addOrSelectTag(newTag) {
+        const isNewTag = !usableTags.includes(newTag);
+        const isNotSelected = !selectedTags.includes(newTag);
+
+        if (isNewTag && newTag !== '') {
+            usableTags.push(newTag); // Yeni etiket usableTags'a eklenir
+        }
+
+        if (isNewTag || isNotSelected) {
+            selectedTags.push(newTag); // Yeni veya daha önceden var olan fakat seçilmemiş etiket, selectedTags'a eklenir
+        }
+
+        updateUsableTagsDisplay();
+        updateSelectedTagsDisplay();
+        realTagDefiner.value = ''; // Girdi temizlenir
+        addNewTagBtnContainer.innerHTML = ''; // Ekleme butonu kaldırılır
+    }
+
+    function updateUsableTagsDisplay() {
+        preTagContainer.innerHTML = ''; // Var olan etiketler temizlenir
+        textUsableTags.value = usableTags.join(', ');
+
+        usableTags.forEach(function(tag) {
+            const tagEl = document.createElement('div');
+            tagEl.className = 'pre-tag';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = selectedTags.includes(tag);
+            checkbox.onchange = function() {
+                if (this.checked) {
+                    if (!selectedTags.includes(tag)) {
+                        selectedTags.push(tag);
+                    }
+                } else {
+                    selectedTags = selectedTags.filter(t => t !== tag);
+                }
+                updateSelectedTagsDisplay();
+            };
+
+            const tagName = document.createElement('span');
+            tagName.textContent = tag;
+
+            const deleteBtn = document.createElement('span');
+            deleteBtn.textContent = 'X';
+            deleteBtn.onclick = function() {
+                if (!checkbox.checked) {
+                    usableTags = usableTags.filter(t => t !== tag);
+                    updateUsableTagsDisplay();
+                }
+                // Eğer checkbox seçiliyse, silme işlemi gerçekleşmez
+            };
+
+            tagEl.appendChild(checkbox);
+            tagEl.appendChild(tagName);
+            tagEl.appendChild(deleteBtn);
+            preTagContainer.appendChild(tagEl);
+        });
+    }
+
+    function updateSelectedTagsDisplay() {
+		// Sadece 'real-tag' kutucuklarını temizle, real-tag-definer ve add-new-tag-btn-container'ı koru
+		const existingTags = realTagContainer.querySelectorAll('.real-tag');
+		existingTags.forEach(tag => tag.remove());
+		textSelectedTags.value = selectedTags.join(', ');
+		// Var olan etiketler temizlendikten sonra yenilerini ekle
+		selectedTags.forEach(function(tag) {
+			const tagEl = document.createElement('div');
+			tagEl.className = 'real-tag';
+			const tagName = document.createElement('span');
+			tagName.textContent = tag;
+
+			const deleteBtn = document.createElement('span');
+			deleteBtn.textContent = 'X';
+			deleteBtn.onclick = function() {
+				selectedTags = selectedTags.filter(t => t !== tag);
+				updateSelectedTagsDisplay();
+				updateUsableTagsDisplay(); // pre-tag'lerin durumunu güncelle
+			};
+
+			tagEl.appendChild(tagName);
+			tagEl.appendChild(deleteBtn);
+			realTagContainer.insertBefore(tagEl, realTagDefiner); // real-tag-definer'dan önce ekle
+		});
+	}
+	
+	realTagContainer.addEventListener('click', function (event) {        
+        if (event.target === realTagContainer) {
+            realTagDefiner.focus(); // Metin kutusuna odaklan
+        }
+    });
+	
+	realTagContainer.addEventListener('click', function() {
+        preTagContainer.style.display = 'flex'; // Görünür yap
+    });
+	
+	document.addEventListener('click', function(event) {
+        // 'pre-tag-container' dışında bir yere tıklanırsa gizle
+        // Bu kontrol, 'real-tag-container' içindeki bir tıklamayı da içerir, çünkü 'real-tag-container' 'pre-tag-container'ı tekrar gösterecektir.
+        if (!preTagContainer.contains(event.target) && !realTagContainer.contains(event.target)) {
+            preTagContainer.style.display = 'none';
+        }
+		
+    });
+});
+
+
+
+</script>
+
+
+
+</body>
+</html>

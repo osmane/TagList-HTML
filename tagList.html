@@ -22,6 +22,8 @@
             border: 1px solid #ccc;
             padding: 0px;
             align-items: flex-start;
+            position: absolute;
+            background: white;
         }
         .pre-tag,
         .real-tag {
@@ -67,6 +69,7 @@
 
         .selected-tag {
             border: 1px solid rgb(65, 107, 65);
+            background: bisque;
         }
     </style>
 </head>
@@ -182,6 +185,16 @@
                         }
                         updateSelectedTagsDisplay();
                         updateUsableTagsDisplay();
+                    });
+
+                    tagEl.addEventListener('click', function(event) {
+                        event.stopPropagation(); // Bu, tıklama olayının daha üst elementlere yayılmasını önler
+                        // Burada, tagEl'e tıklanınca gerçekleşecek işlemler yer alır
+                    });
+
+                    deleteBtn.addEventListener('click', function(event) {
+                        event.stopPropagation(); // Bu, tıklama olayının daha üst elementlere yayılmasını önler
+                        // Silme işleminin gerçekleştirilmesi
                     });
                 });
             }

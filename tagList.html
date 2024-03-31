@@ -142,36 +142,38 @@
                 usableTags.forEach(function (tag) {
                     const tagEl = document.createElement('div');
                     tagEl.className = 'pre-tag';
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = selectedTags.includes(tag);
-                    checkbox.onchange = function () {
-                        if (this.checked) {
-                            if (!selectedTags.includes(tag)) {
-                                selectedTags.push(tag);
-                            }
-                        } else {
-                            selectedTags = selectedTags.filter(t => t !== tag);
-                        }
-                        updateSelectedTagsDisplay();
-                    };
-
+                    
+                    // Checkbox elementini kaldırdık
+                    
                     const tagName = document.createElement('span');
                     tagName.textContent = tag;
 
                     const deleteBtn = document.createElement('span');
                     deleteBtn.textContent = 'X';
-                    deleteBtn.onclick = function () {
-                        if (!checkbox.checked) {
-                            usableTags = usableTags.filter(t => t !== tag);
-                            updateUsableTagsDisplay();
-                        }
+                    deleteBtn.onclick = function (event) {
+                        event.stopPropagation(); // Bu, tıklama olayının üst elementlere yayılmasını önler
+                        usableTags = usableTags.filter(t => t !== tag);
+                        selectedTags = selectedTags.filter(t => t !== tag); // Eğer etiket seçilmişse, seçimden kaldır
+                        updateUsableTagsDisplay();
+                        updateSelectedTagsDisplay();
                     };
 
-                    tagEl.appendChild(checkbox);
+                    // Checkbox ile ilgili kodları kaldırdık
+                    
                     tagEl.appendChild(tagName);
                     tagEl.appendChild(deleteBtn);
                     preTagContainer.appendChild(tagEl);
+
+                    // Tıklama olayı için event listener ekleme
+                    tagEl.addEventListener('click', function() {
+                        const tagIndex = selectedTags.indexOf(tag);
+                        if (tagIndex === -1) {
+                            selectedTags.push(tag); // Etiketi selectedTags listesine ekle
+                        } else {
+                            selectedTags.splice(tagIndex, 1); // Etiketi selectedTags listesinden çıkar
+                        }
+                        updateSelectedTagsDisplay();
+                    });
                 });
             }
 

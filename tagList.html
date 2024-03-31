@@ -71,6 +71,15 @@
             border: 1px solid rgb(65, 107, 65);
             background: bisque;
         }
+
+        .delete-btn {
+            clip-path: polygon(10% 0, 0 10%, 40% 50%, 0 90%, 10% 100%, 50% 60%, 90% 100%, 100% 90%, 60% 50%, 100% 10%, 90% 0, 50% 40%);
+            content: "";
+            display: inline-block;
+            background-color: #7f1c00;
+            width: 10px;
+            height: 10px;
+        }
     </style>
 </head>
 
@@ -177,7 +186,8 @@
                         tagName.textContent = tag;
 
                         const deleteBtn = document.createElement('span');
-                        deleteBtn.textContent = 'X';
+                        deleteBtn.classList.add('delete-btn');
+                        //deleteBtn.textContent = 'X';
                         deleteBtn.onclick = function (event) {
                             event.stopPropagation(); // Bu, tıklama olayının üst elementlere yayılmasını önler
                             usableTags = usableTags.filter(t => t !== tag);
@@ -229,7 +239,7 @@
                     tagName.textContent = tag;
 
                     const deleteBtn = document.createElement('span');
-                    deleteBtn.textContent = 'X';
+                    deleteBtn.classList.add('delete-btn');
                     deleteBtn.onclick = function () {
                         selectedTags = selectedTags.filter(t => t !== tag);
                         updateSelectedTagsDisplay();

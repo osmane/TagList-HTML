@@ -217,6 +217,14 @@
                 }
             });
 
+            realTagDefiner.addEventListener('keydown', function (event) {
+                // Eğer basılan tuş Tab ise ve input alanı boş değilse
+                if (event.key === 'Tab' && this.value.trim() !== '') {
+                    event.preventDefault(); // Tab tuşunun varsayılan davranışını engelle
+                    addOrSelectTag(this.value.trim()); // addOrSelectTag fonksiyonunu çağır
+                }
+            });
+
         });
         function autoExpandInput(input) {
 

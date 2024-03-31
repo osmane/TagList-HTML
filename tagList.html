@@ -112,16 +112,29 @@
             updateUsableTagsDisplay();
 
             realTagDefiner.addEventListener('input', function () {
+                // Yeni etiket ekleme butonunu güncelleme fonksiyonunu buraya taşıdık
+                updateAddButton(this.value);
+                // Etiketlerin görüntülenmesini güncelle
+                updateUsableTagsDisplay();
+            });
+
+            // Etiket ekleme butonunu güncelleyen fonksiyonu tanımlayın
+            function updateAddButton(value) {
                 addNewTagBtnContainer.innerHTML = '';
-                if (this.value.trim() !== '') {
+                if (value.trim() !== '') {
                     const addButton = document.createElement('button');
-                    addButton.textContent = `Add new ${this.value}`;
+                    addButton.textContent = `Add new ${value}`;
                     addButton.onclick = function () {
-                        addOrSelectTag(realTagDefiner.value.trim());
+                        addOrSelectTag(value.trim());
                     };
                     addNewTagBtnContainer.appendChild(addButton);
                 }
-            });
+            }
+
+            function resetFilter() {
+                realTagDefiner.value = ''; // Filtreleme input'unu temizle
+                updateUsableTagsDisplay(); // Tüm tag'ları tekrar listele
+            }
 
             function addOrSelectTag(newTag) {
                 const isNewTag = !usableTags.includes(newTag);
@@ -135,67 +148,72 @@
                     selectedTags.push(newTag);
                 }
 
-                updateUsableTagsDisplay();
+                resetFilter(); // Filtrelemeyi resetle ve tüm tag'ları listele
                 updateSelectedTagsDisplay();
-                realTagDefiner.value = '';
                 addNewTagBtnContainer.innerHTML = '';
             }
 
             function updateUsableTagsDisplay() {
+                const filterText = realTagDefiner.value.toLowerCase().trim();
+                // Mevcut etiketleri kaldır
                 const existingTags = preTagContainer.querySelectorAll('.pre-tag');
                 existingTags.forEach(tag => tag.remove());
+
+                // Filtrelenmiş etiketleri göster
                 textUsableTags.value = usableTags.join(', ');
 
                 usableTags.forEach(function (tag) {
-                    const tagEl = document.createElement('div');
-                    tagEl.className = 'pre-tag';
-                    
-                    if (selectedTags.includes(tag)) {
-                        tagEl.classList.add('selected-tag'); // Seçili etiketler için sınıfı ekle
-                    } else {
-                        tagEl.classList.remove('selected-tag'); // Sınıfı kaldır
-                    }
-                    
-                    const tagName = document.createElement('span');
-                    tagName.textContent = tag;
-
-                    const deleteBtn = document.createElement('span');
-                    deleteBtn.textContent = 'X';
-                    deleteBtn.onclick = function (event) {
-                        event.stopPropagation(); // Bu, tıklama olayının üst elementlere yayılmasını önler
-                        usableTags = usableTags.filter(t => t !== tag);
-                        selectedTags = selectedTags.filter(t => t !== tag); // Eğer etiket seçilmişse, seçimden kaldır
-                        updateUsableTagsDisplay();
-                        updateSelectedTagsDisplay();
-                    };
-
-                    // Checkbox ile ilgili kodları kaldırdık
-                    
-                    tagEl.appendChild(tagName);
-                    tagEl.appendChild(deleteBtn);
-                    preTagContainer.appendChild(tagEl);
-
-                    // Tıklama olayı için event listener ekleme
-                    tagEl.addEventListener('click', function() {
-                        const tagIndex = selectedTags.indexOf(tag);
-                        if (tagIndex === -1) {
-                            selectedTags.push(tag); // Etiketi selectedTags listesine ekle
+                    if (tag.toLowerCase().includes(filterText) || filterText === '') {
+                        const tagEl = document.createElement('div');
+                        tagEl.className = 'pre-tag';
+                        
+                        if (selectedTags.includes(tag)) {
+                            tagEl.classList.add('selected-tag'); // Seçili etiketler için sınıfı ekle
                         } else {
-                            selectedTags.splice(tagIndex, 1); // Etiketi selectedTags listesinden çıkar
+                            tagEl.classList.remove('selected-tag'); // Sınıfı kaldır
                         }
-                        updateSelectedTagsDisplay();
-                        updateUsableTagsDisplay();
-                    });
+                        
+                        const tagName = document.createElement('span');
+                        tagName.textContent = tag;
 
-                    tagEl.addEventListener('click', function(event) {
-                        event.stopPropagation(); // Bu, tıklama olayının daha üst elementlere yayılmasını önler
-                        // Burada, tagEl'e tıklanınca gerçekleşecek işlemler yer alır
-                    });
+                        const deleteBtn = document.createElement('span');
+                        deleteBtn.textContent = 'X';
+                        deleteBtn.onclick = function (event) {
+                            event.stopPropagation(); // Bu, tıklama olayının üst elementlere yayılmasını önler
+                            usableTags = usableTags.filter(t => t !== tag);
+                            selectedTags = selectedTags.filter(t => t !== tag); // Eğer etiket seçilmişse, seçimden kaldır
+                            updateUsableTagsDisplay();
+                            updateSelectedTagsDisplay();
+                        };
 
-                    deleteBtn.addEventListener('click', function(event) {
-                        event.stopPropagation(); // Bu, tıklama olayının daha üst elementlere yayılmasını önler
-                        // Silme işleminin gerçekleştirilmesi
-                    });
+                        // Checkbox ile ilgili kodları kaldırdık
+                        
+                        tagEl.appendChild(tagName);
+                        tagEl.appendChild(deleteBtn);
+                        preTagContainer.appendChild(tagEl);
+
+                        // Tıklama olayı için event listener ekleme
+                        tagEl.addEventListener('click', function() {
+                            const tagIndex = selectedTags.indexOf(tag);
+                            if (tagIndex === -1) {
+                                selectedTags.push(tag); // Etiketi selectedTags listesine ekle
+                            } else {
+                                selectedTags.splice(tagIndex, 1); // Etiketi selectedTags listesinden çıkar
+                            }
+                            updateSelectedTagsDisplay();
+                            updateUsableTagsDisplay();
+                        });
+
+                        tagEl.addEventListener('click', function(event) {
+                            event.stopPropagation(); // Bu, tıklama olayının daha üst elementlere yayılmasını önler
+                            // Burada, tagEl'e tıklanınca gerçekleşecek işlemler yer alır
+                        });
+
+                        deleteBtn.addEventListener('click', function(event) {
+                            event.stopPropagation(); // Bu, tıklama olayının daha üst elementlere yayılmasını önler
+                            // Silme işleminin gerçekleştirilmesi
+                        });
+                    }
                 });
             }
 

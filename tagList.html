@@ -64,6 +64,10 @@
             min-width: 80px;            
             resize: none;
         }
+
+        .selected-tag {
+            border: 1px solid rgb(65, 107, 65);
+        }
     </style>
 </head>
 
@@ -143,7 +147,11 @@
                     const tagEl = document.createElement('div');
                     tagEl.className = 'pre-tag';
                     
-                    // Checkbox elementini kaldırdık
+                    if (selectedTags.includes(tag)) {
+                        tagEl.classList.add('selected-tag'); // Seçili etiketler için sınıfı ekle
+                    } else {
+                        tagEl.classList.remove('selected-tag'); // Sınıfı kaldır
+                    }
                     
                     const tagName = document.createElement('span');
                     tagName.textContent = tag;
@@ -173,6 +181,7 @@
                             selectedTags.splice(tagIndex, 1); // Etiketi selectedTags listesinden çıkar
                         }
                         updateSelectedTagsDisplay();
+                        updateUsableTagsDisplay();
                     });
                 });
             }
